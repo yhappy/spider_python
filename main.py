@@ -15,14 +15,10 @@
 import redis
 import re
 import requests
-import logging
 import time
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from BeautifulSoup import BeautifulSoup
 
-LOG_ADDRESS = '/usr/local/var/log/spider_logging.txt'                   # 日志文件地址
-LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'     # 日志格式
-LOG_LEVEL = logging.DEBUG                                               # 日志级别
 HOST_NAME = '127.0.0.1'                                                 # Web页面的ip
 PORT_NUMBER = 8888                                                      # Web页面的port
 REDIS_IP = '127.0.0.1'                                                  # Redis的ip
@@ -30,44 +26,27 @@ REDIS_PORT = 6379                                                       # Redis�
 REDIS_FREQUENCE = 10                                                    # Redis清空的频率
 SPIDER_KEYS = (u'校招', u'应届', u'毕业生', 'Google')                   # 筛选的关键词
 CRAWLER_FREQUENCE = 60 * 60 * 3600                                      # 每隔一个小时爬取一次
-last_run_time = time.time()                                             # 记录上一次爬取的时间
 
 
 class HttpHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
-        """Respond to a GET request."""
+        crawler = Crawler()
+        page = crawler.generate_page()
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
-
-        crawler = Crawler()
-        global last_run_time
-        if (time.time() - last_run_time >= CRAWLER_FREQUENCE):
-            crawler.run()
-            last_run_time = time.time()
-
-        page = crawler.generate_page()
         self.wfile.write(page)
         return 
     
 
 class Crawler:
 
+    last_crawl_time = time.time()
+
     def __init__(self):
-        self.logger = self._init_log()
         self.rs = redis.Redis(host=REDIS_IP, port=REDIS_PORT)
         self.http_querys = self._init_http_querys()
-
-    def _init_log(self):
-        logger = logging.getLogger() 
-        handler = logging.FileHandler(LOG_ADDRESS)
-        formatter = logging.Formatter(LOG_FORMAT) 
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        logger.setLevel(LOG_LEVEL)
-        logger.info('Crawler start!')
-        return logger
 
     def _init_http_querys(self):
         return (
@@ -106,20 +85,20 @@ class Crawler:
                 urls.append(res)
         return urls
 
-    def _put_urls_into_redis(self, urls, rs):
+    def _put_urls_into_redis(self, urls):
         for url in urls:
             title = url.string
             if filter(lambda x: x in title, SPIDER_KEYS):
-                rs.sadd('urls', url)
+                self.rs.sadd('urls', url)
 
-    def _flush_redis_at_times(self, rs):
-        rs.incr('times')
-        if int(rs.get('times')) >= REDIS_FREQUENCE:
-            rs.flushall()
+    def _flush_redis_if_needed(self):
+        self.rs.incr('times')
+        if int(self.rs.get('times')) >= REDIS_FREQUENCE:
+            self.rs.flushall()
 
-    def _crawl_html(self, rs, host, url, headers, href):
+    def _crawl_html(self, host, url, headers, href):
         urls = self._parse_html_to_urls(host, url, headers, href)
-        self._put_urls_into_redis(urls, rs)
+        self._put_urls_into_redis(urls)
 
     def _get_urls_from_redis(self):
         ret = self.rs.smembers('urls')
@@ -127,8 +106,14 @@ class Crawler:
         for herf in ret:
             urls += herf + "<br/>"
         return urls
+    
+    def _run_crawler_if_needed(self):
+        if (time.time() - self.__class__.last_crawl_time >= CRAWLER_FREQUENCE):
+            self.__class__.last_crawl_time = time.time()
+            self.run()
 
     def generate_page(self):
+        self._run_crawler_if_needed()
         return '''
                 <html>
                     <head>
@@ -148,17 +133,18 @@ class Crawler:
                 ''' % self._get_urls_from_redis()
 
     def run(self):
-        self._flush_redis_at_times(self.rs)
+        print "start crawler ..."
+        self._flush_redis_if_needed()
         for http_query in self.http_querys :
-            self._crawl_html(self.rs, http_query['host'], http_query['url'], http_query['headers'], http_query['href'])
+            self._crawl_html(http_query['host'], http_query['url'], http_query['headers'], http_query['href'])
+        print "run crawler successfully!"
 
-    def __del__(self):
-        self.logger.info("Crawler finish!\n") 
 
 if __name__ == '__main__':
     try:
         crawler = Crawler()
         crawler.run()
+        print "start server ..."
         server = HTTPServer((HOST_NAME, PORT_NUMBER), HttpHandler)
         server.serve_forever()
     except KeyboardInterrupt:
