@@ -63,7 +63,7 @@ class Crawler:
                                     },
                                     'href' : "^/nForum/article/Career_Campus/\d+$",
                                 },
-                            )
+                        )
 
     def _parse_html_to_urls(self, host, url, headers, href):
         r = requests.get(url, headers = headers)
