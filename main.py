@@ -91,7 +91,6 @@ class Crawler:
                 self.rs.sadd('urls', url)
 
     def _flush_redis_if_needed(self):
-        self.rs.incr('times')
         if int(self.rs.get('times')) >= REDIS_FLUSH_FREQUENCE:
             self.rs.flushall()
 
@@ -127,6 +126,7 @@ class Crawler:
     
     def run(self):
         print "start crawler ..."
+        self.rs.incr('times')
         self._flush_redis_if_needed()
         for http_query in self.http_querys :
             self._crawl_html(http_query['host'], http_query['url'], http_query['headers'], http_query['href'])
