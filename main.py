@@ -12,10 +12,10 @@
 #=============================================================================
 '''
 
+import time
 import redis
 import re
 import requests
-import time
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from BeautifulSoup import BeautifulSoup
 
