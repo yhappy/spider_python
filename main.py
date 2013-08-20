@@ -137,7 +137,7 @@ class Crawler:
         self._flush_redis_if_needed()
         for http_query in self.http_querys :
             self._crawl_html(http_query['host'], http_query['url'], http_query['headers'], http_query['href'])
-        print "run crawler successfully!"
+        print "finish crawler ..."
 
 
 if __name__ == '__main__':
@@ -148,4 +148,5 @@ if __name__ == '__main__':
         server = HTTPServer((HOST_NAME, PORT_NUMBER), HttpHandler)
         server.serve_forever()
     except KeyboardInterrupt:
+        print "finish server ..."
         server.socket.close()
