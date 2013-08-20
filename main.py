@@ -16,6 +16,7 @@ import redis
 import re
 import requests
 import logging
+import time
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from BeautifulSoup import BeautifulSoup
 
@@ -26,18 +27,27 @@ HOST_NAME = '127.0.0.1'                                                 # Web页
 PORT_NUMBER = 8888                                                      # Web页面的port
 REDIS_IP = '127.0.0.1'                                                  # Redis的ip
 REDIS_PORT = 6379                                                       # Redis的port
-REDIS_FREQUENCE = 10                                               # Redis清空的频率
+REDIS_FREQUENCE = 10                                                    # Redis清空的频率
 SPIDER_KEYS = (u'校招', u'应届', u'毕业生', 'Google')                   # 筛选的关键词
+CRAWLER_FREQUENCE = 60 * 60 * 3600                                      # 每隔一个小时爬取一次
+last_run_time = time.time()                                             # 记录上一次爬取的时间
 
 
 class HttpHandler(BaseHTTPRequestHandler):
+
     def do_GET(self):
         """Respond to a GET request."""
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
+
         crawler = Crawler()
-        page = crawler.run()
+        global last_run_time
+        if (time.time() - last_run_time >= CRAWLER_FREQUENCE):
+            crawler.run()
+            last_run_time = time.time()
+
+        page = crawler.generate_page()
         self.wfile.write(page)
         return 
     
@@ -118,7 +128,7 @@ class Crawler:
             urls += herf + "<br/>"
         return urls
 
-    def _generate_page(self):
+    def generate_page(self):
         return '''
                 <html>
                     <head>
@@ -141,13 +151,14 @@ class Crawler:
         self._flush_redis_at_times(self.rs)
         for http_query in self.http_querys :
             self._crawl_html(self.rs, http_query['host'], http_query['url'], http_query['headers'], http_query['href'])
-        return self._generate_page()
 
     def __del__(self):
         self.logger.info("Crawler finish!\n") 
 
 if __name__ == '__main__':
     try:
+        crawler = Crawler()
+        crawler.run()
         server = HTTPServer((HOST_NAME, PORT_NUMBER), HttpHandler)
         server.serve_forever()
     except KeyboardInterrupt:
