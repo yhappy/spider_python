@@ -94,10 +94,6 @@ class Crawler:
         if int(self.rs.get('times')) >= REDIS_FLUSH_FREQUENCE:
             self.rs.flushall()
 
-    def _crawl_html(self, host, url, headers, href):
-        urls = self._parse_html_to_urls(host, url, headers, href)
-        self._put_urls_into_redis(urls)
-
     def _get_urls_from_redis(self):
         ret = self.rs.smembers('urls')
         urls = "" 
@@ -129,7 +125,8 @@ class Crawler:
         self.rs.incr('times')
         self._flush_redis_if_needed()
         for http_query in self.http_querys :
-            self._crawl_html(http_query['host'], http_query['url'], http_query['headers'], http_query['href'])
+            urls = self._parse_html_to_urls(http_query['host'], http_query['url'], http_query['headers'], http_query['href'])
+            self._put_urls_into_redis(urls)
         print "finish crawler ..."
 
 
