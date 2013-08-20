@@ -18,14 +18,15 @@ import re
 import requests
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from BeautifulSoup import BeautifulSoup
+from apscheduler.scheduler import Scheduler
 
 HOST_NAME = '127.0.0.1'                                                 # Web页面的ip
 PORT_NUMBER = 8888                                                      # Web页面的port
 REDIS_IP = '127.0.0.1'                                                  # Redis的ip
 REDIS_PORT = 6379                                                       # Redis的port
-REDIS_FREQUENCE = 10                                                    # Redis清空的频率
+REDIS_FLUSH_FREQUENCE = 10                                              # Redis清空的频率
 SPIDER_KEYS = (u'校招', u'应届', u'毕业生', 'Google')                   # 筛选的关键词
-CRAWLER_FREQUENCE = 60 * 60 * 3600                                      # 每隔一个小时爬取一次
+CRAWLER_FREQUENCE_HOURS = 1                                             # 每隔一个小时爬取一次
 
 
 class HttpHandler(BaseHTTPRequestHandler):
@@ -41,8 +42,6 @@ class HttpHandler(BaseHTTPRequestHandler):
     
 
 class Crawler:
-
-    last_crawl_time = time.time()
 
     def __init__(self):
         self.rs = redis.Redis(host=REDIS_IP, port=REDIS_PORT)
@@ -93,7 +92,7 @@ class Crawler:
 
     def _flush_redis_if_needed(self):
         self.rs.incr('times')
-        if int(self.rs.get('times')) >= REDIS_FREQUENCE:
+        if int(self.rs.get('times')) >= REDIS_FLUSH_FREQUENCE:
             self.rs.flushall()
 
     def _crawl_html(self, host, url, headers, href):
@@ -107,13 +106,7 @@ class Crawler:
             urls += herf + "<br/>"
         return urls
     
-    def _run_crawler_if_needed(self):
-        if (time.time() - self.__class__.last_crawl_time >= CRAWLER_FREQUENCE):
-            self.__class__.last_crawl_time = time.time()
-            self.run()
-
     def generate_page(self):
-        self._run_crawler_if_needed()
         return '''
                 <html>
                     <head>
@@ -131,7 +124,7 @@ class Crawler:
                     </body>
                     </html>
                 ''' % self._get_urls_from_redis()
-
+    
     def run(self):
         print "start crawler ..."
         self._flush_redis_if_needed()
@@ -141,9 +134,12 @@ class Crawler:
 
 
 if __name__ == '__main__':
+    crawler = Crawler()
+    crawler.run()
+    sched = Scheduler()
+    sched.start()
+    sched.add_interval_job(crawler.run, hours = CRAWLER_FREQUENCE_HOURS)
     try:
-        crawler = Crawler()
-        crawler.run()
         print "start server ..."
         server = HTTPServer((HOST_NAME, PORT_NUMBER), HttpHandler)
         server.serve_forever()
