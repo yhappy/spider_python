@@ -12,7 +12,6 @@
 #=============================================================================
 '''
 
-import time
 import redis
 import re
 import requests
