@@ -18,7 +18,7 @@ import BaseHTTPServer
 
 
 HOST_NAME = '127.0.0.1' # !!!REMEMBER TO CHANGE THIS!!!
-PORT_NUMBER = 9000 # Maybe set this to 9000.
+PORT_NUMBER = 8082 # Maybe set this to 9000.
 
 
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
