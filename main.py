@@ -45,28 +45,25 @@ class Crawler:
 
     def __init__(self):
         self.rs = redis.Redis(host=REDIS_IP, port=REDIS_PORT)
-        self.http_querys = self._init_http_querys()
+        self.http_querys = (
+                                {
+                                    'host' : 'http://bbs.byr.cn',
+                                    'url'  : 'http://bbs.byr.cn/board/JobInfo',
+                                    'headers' : {
+                                        "X-Requested-With" : "XMLHttpRequest",
+                                    },
+                                    'href' : "^/article/JobInfo/\d+$",
+                                },
 
-    def _init_http_querys(self):
-        return (
-                {
-                    'host' : 'http://bbs.byr.cn',
-                    'url'  : 'http://bbs.byr.cn/board/JobInfo',
-                    'headers' : {
-                        "X-Requested-With" : "XMLHttpRequest",
-                    },
-                    'href' : "^/article/JobInfo/\d+$",
-                },
-
-                {
-                    'host' : 'http://www.newsmth.net',
-                    'url'  : 'http://www.newsmth.net/nForum/board/Career_Campus',
-                    'headers' : {
-                        "X-Requested-With" : "XMLHttpRequest",
-                    },
-                    'href' : "^/nForum/article/Career_Campus/\d+$",
-                },
-            )
+                                {
+                                    'host' : 'http://www.newsmth.net',
+                                    'url'  : 'http://www.newsmth.net/nForum/board/Career_Campus',
+                                    'headers' : {
+                                        "X-Requested-With" : "XMLHttpRequest",
+                                    },
+                                    'href' : "^/nForum/article/Career_Campus/\d+$",
+                                },
+                            )
 
     def _parse_html_to_urls(self, host, url, headers, href):
         r = requests.get(url, headers = headers)
