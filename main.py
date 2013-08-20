@@ -134,11 +134,14 @@ class Crawler:
 
 
 if __name__ == '__main__':
+
     crawler = Crawler()
     crawler.run()
+
     sched = Scheduler()
     sched.start()
     sched.add_interval_job(crawler.run, hours = CRAWLER_FREQUENCE_HOURS)
+
     try:
         print "start server ..."
         server = HTTPServer((HOST_NAME, PORT_NUMBER), HttpHandler)
