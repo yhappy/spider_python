@@ -19,13 +19,13 @@ import re
 import redis
 import requests
 
-HOST_NAME = '127.0.0.1'                                                 # Web页面的ip
-PORT_NUMBER = 8888                                                      # Web页面的port
-REDIS_IP = '127.0.0.1'                                                  # Redis的ip
-REDIS_PORT = 6379                                                       # Redis的port
-REDIS_FLUSH_FREQUENCE = 10                                              # Redis清空的频率
-SPIDER_KEYS = (u'校招', u'应届', u'毕业生', 'Google')                   # 筛选的关键词
-CRAWLER_FREQUENCE_HOURS = 1                                             # 每隔一个小时爬取一次
+HOST_NAME = '127.0.0.1'  # Web页面的ip
+PORT_NUMBER = 8888  # Web页面的port
+REDIS_IP = '127.0.0.1'  # Redis的ip
+REDIS_PORT = 6379  # Redis的port
+REDIS_FLUSH_FREQUENCE = 10  # Redis清空的频率
+SPIDER_KEYS = (u'校招', u'应届', u'毕业生', 'Google')  # 筛选的关键词
+CRAWLER_FREQUENCE_HOURS = 1  # 每隔一个小时爬取一次
 
 
 class HttpHandler(BaseHTTPRequestHandler):
@@ -65,14 +65,14 @@ class Crawler:
                         )
 
     def _parse_html_to_urls(self, host, url, headers, href):
-        r = requests.get(url, headers = headers)
+        r = requests.get(url, headers=headers)
         frs_soup = BeautifulSoup(r.text)
         frs_attrs = {
             'href' : re.compile(href),
             'title' : None,
             'target' : None,
         }
-        frs_res =  frs_soup.findAll('a', frs_attrs)
+        frs_res = frs_soup.findAll('a', frs_attrs)
         urls = []
         for res in frs_res:
             if res.parent.parent.get('class') != 'top':
@@ -133,7 +133,7 @@ if __name__ == '__main__':
 
     sched = Scheduler()
     sched.start()
-    sched.add_interval_job(crawler.run, hours = CRAWLER_FREQUENCE_HOURS)
+    sched.add_interval_job(crawler.run, hours=CRAWLER_FREQUENCE_HOURS)
     
 
     try:
