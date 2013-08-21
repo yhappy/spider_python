@@ -1,7 +1,9 @@
 spider_python
 =============
 
-抓取北邮人论坛和水木社区校招信息的爬虫程序, 直接运行main.py，访问127.0.0.1:8888即可，非常简洁，可以扩展
+抓取北邮人论坛和水木社区校招信息的爬虫程序。
+Windows下需要运行redis服务程序 redis-server.exe；
+直接运行main.py程序后，访问 127.0.0.1:8888 即可，非常简洁，可以扩展。
 
 程序依赖以下第三方Python包：requests, BeautifulSoup, redis-py, APScheduler
     
