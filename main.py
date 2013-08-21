@@ -12,12 +12,12 @@
 #=============================================================================
 '''
 
-import redis
-import re
-import requests
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from BeautifulSoup import BeautifulSoup
 from apscheduler.scheduler import Scheduler
+import re
+import redis
+import requests
 
 HOST_NAME = '127.0.0.1'                                                 # Web页面的ip
 PORT_NUMBER = 8888                                                      # Web页面的port
@@ -134,6 +134,7 @@ if __name__ == '__main__':
     sched = Scheduler()
     sched.start()
     sched.add_interval_job(crawler.run, hours = CRAWLER_FREQUENCE_HOURS)
+    
 
     try:
         print "start server ..."
