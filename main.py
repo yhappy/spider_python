@@ -94,24 +94,37 @@ class Crawler:
         ret = self.rs.smembers('urls')
         urls = "" 
         for herf in ret:
-            urls += herf + "<br/>"
+            urls += "<tr><td>" + herf + "</td></tr>"
         return urls
     
     def generate_page(self):
         return '''
                 <html>
                     <head>
+                        <meta charset="utf-8">
                         <title>Welcome to spider!</title>
+                        <link href="//cdnjs.bootcss.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet">
                         <style>
                             body {
                                 width: 35em;
                                 margin: 0 auto;
                             }
+                            .table-hover tbody tr:hover > td,
+                                .table-hover tbody tr:hover > th {
+                                background-color: #D2DAFF;
+                            }
                             a:visited { color: red; }
                         </style>
                     </head>
                     <body>
-                        %s
+                        <h3>招聘信息筛选</h3>
+                        <h4 class="text-info">红色链接为您已打开过的链接</h4><hr>
+                        <div class="well well-large">
+                            <table class="table table-hover">
+                                <tbody>
+                                    %s
+                                </tbody>
+                            </table>
                     </body>
                     </html>
                 ''' % self._get_urls_from_redis()
