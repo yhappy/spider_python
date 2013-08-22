@@ -7,6 +7,8 @@ spider_python
 
 新增手机短信通知功能，需要在conf.py里配置139手机号，发件箱账号和密码。
 
+不支持Python3.
+
 Unix/Windows下均需要先在本机安装[redis](http://redis.io)服务程序，然后在Unix下运行redis-server，在Windows下启动redis-server.exe。
 
 安装示例：Mac OS X下安装redis
