@@ -53,7 +53,7 @@ SEND_MAIL_PASSWORD = "密码"
 # 发件箱的用户昵称
 SEND_MAIL_USER_NAME = "昵称"
 
-# 139收件箱的用户名，即移动手机号
+# 139收件箱的用户名，即手机号
 RECEIVE_MAIL_USER = "手机号"
 
 # 139收件箱的域名
