@@ -86,9 +86,10 @@ class Crawler:
             if filter(lambda x: x in title, MESSAGE_FILETER_KEYS) and not self.rs.sismember('outdated_message_urls', url):
                 self.rs.sadd('current_message_urls', url)
 
-    def _flush_redis_if_needed(self):
+    def _delete_web_urls_if_needed(self):
         if int(self.rs.get('times')) >= REDIS_FLUSH_FREQUENCE:
-            self.rs.flushall()
+            self.rs.delete('web_urls')
+            self.rs.delete('times')
 
     def _get_message_urls_from_redis(self):
         ret = self.rs.smembers('current_message_urls')
@@ -168,7 +169,7 @@ class Crawler:
     def run(self):
         print "start crawler ..."
         self.rs.incr('times')
-        self._flush_redis_if_needed()
+        self._delete_web_urls_if_needed()
         for http_query in self.http_querys :
             urls = self._parse_html_to_urls(http_query['host'], http_query['url'], http_query['headers'], http_query['href'])
             self._put_urls_into_redis(urls)
