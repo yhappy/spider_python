@@ -5,11 +5,30 @@ spider_python
 
 爬虫默认每隔1小时抓取1次，每抓取10次清空所有数据。
 
-Unix/Windows下均需要先在本机运行redis服务程序，Unix下运行redis-server，Windows下启动redis-server.exe；
+Unix/Windows下均需要先在本机运行[redis](http://redis.io)服务程序，Unix下运行redis-server，Windows下启动redis-server.exe；
 
-程序依赖以下第三方Python包：requests, BeautifulSoup, redis-py, APScheduler，用pip或easy_install安装即可。
+安装示例：Mac OS X下安装redis
 
-然后直接运行main.py程序，访问<http://127.0.0.1:8888>。
+    brew install redis
+
+此外，程序依赖以下第三方Python包：
+
+* [APScheduler](http://pythonhosted.org/APScheduler)
+
+* [BeautifulSoup 3.2.1](http://www.crummy.com/software/BeautifulSoup/bs3/documentation.zh.html)
+
+* [redis-py](https://github.com/andymccurdy/redis-py)
+
+* [requests](https://github.com/kennethreitz/requests)
+
+安装示例：Mac OS X/Linux下安装Python第三方包
+    
+    pip install APScheduler
+    pip install BeautifulSoup
+    pip install redis
+    pip install requests
+    
+然后直接运行main.py程序，访问<http://127.0.0.1:8888>
     
 效果如下：
 
