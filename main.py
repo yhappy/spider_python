@@ -15,17 +15,15 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from BeautifulSoup import BeautifulSoup
 from apscheduler.scheduler import Scheduler
+from email.mime.text import MIMEText
+from conf import *
+
+import smtplib
+import sys
+import email
 import re
 import redis
 import requests
-
-HOST_NAME = '127.0.0.1'  # Web页面的ip
-PORT_NUMBER = 8888  # Web页面的port
-REDIS_IP = '127.0.0.1'  # Redis的ip
-REDIS_PORT = 6379  # Redis的port
-REDIS_FLUSH_FREQUENCE = 10  # Redis清空的频率
-SPIDER_KEYS = (u'校招', u'应届', u'毕业生', 'Google')  # 筛选的关键词
-CRAWLER_FREQUENCE_HOURS = 1  # 每隔一个小时爬取一次
 
 
 class HttpHandler(BaseHTTPRequestHandler):
@@ -83,15 +81,24 @@ class Crawler:
     def _put_urls_into_redis(self, urls):
         for url in urls:
             title = url.string
-            if filter(lambda x: x in title, SPIDER_KEYS):
-                self.rs.sadd('urls', url)
+            if filter(lambda x: x in title, WEB_FILETER_KEYS):
+                self.rs.sadd('web_urls', url)
+            if filter(lambda x: x in title, MESSAGE_FILETER_KEYS):
+                self.rs.sadd('message_urls', url)
 
     def _flush_redis_if_needed(self):
         if int(self.rs.get('times')) >= REDIS_FLUSH_FREQUENCE:
             self.rs.flushall()
 
-    def _get_urls_from_redis(self):
-        ret = self.rs.smembers('urls')
+    def _get_message_urls_from_redis(self):
+        ret = self.rs.smembers('message_urls')
+        urls = "" 
+        for herf in ret:
+            urls += herf + "<br>"
+        return len(ret), urls
+
+    def _get_web_urls_from_redis(self):
+        ret = self.rs.smembers('web_urls')
         urls = "" 
         for herf in ret:
             urls += "<tr><td>" + herf + "</td></tr>"
@@ -127,8 +134,32 @@ class Crawler:
                             </table>
                     </body>
                     </html>
-                ''' % self._get_urls_from_redis()
+                ''' % self._get_web_urls_from_redis()
     
+    def send_massage(self):
+        msg_num, content = self._get_message_urls_from_redis()
+        if msg_num <= 0 :
+            print "none messages to send..."
+            return 
+        sub = "抓取到%d条高优先级校招信息" % msg_num
+        send_mail_address = SEND_MAIL_USER_NAME + "<" + SEND_MAIL_USER + "@" + SEND_MAIL_POSTFIX + ">"
+        msg = MIMEText(content, 'html', 'utf-8')
+        msg["Accept-Language"]="zh-CN"
+        msg["Accept-Charset"]="ISO-8859-1, utf-8"
+        msg['Subject'] = sub
+        msg['From'] = send_mail_address
+        msg['to'] = to_adress = "139SMSserver<" + RECEIVE_MAIL_USER + "@" + RECEIVE_MAIL_POSTFIX + ">"
+        try:
+            stp = smtplib.SMTP()
+            stp.connect(SEND_MAIL_HOST)
+            stp.login(SEND_MAIL_USER, SEND_MAIL_PASSWORD)
+            stp.sendmail(send_mail_address, to_adress, msg.as_string())
+            print "send message sucessfully..."
+        except Exception, e:
+            print "fail to send message: "+ str(e)
+        finally:
+            stp.close()
+
     def run(self):
         print "start crawler ..."
         self.rs.incr('times')
@@ -147,6 +178,7 @@ if __name__ == '__main__':
     sched = Scheduler()
     sched.start()
     sched.add_interval_job(crawler.run, hours=CRAWLER_FREQUENCE_HOURS)
+    sched.add_interval_job(crawler.send_massage, minutes=MESSAGE_FREQUENCE_MINUTES)
     
 
     try:
