@@ -3,9 +3,12 @@ spider_python
 
 抓取北邮人论坛和水木社区校招信息的爬虫程序。
 
-爬虫默认每隔1小时抓取1次，每抓取10次清空所有数据。
-
 新增手机短信通知功能，需要在conf.py里配置139手机号，发件箱账号和密码。
+
+爬取模块默认每1小时运行1次，同时抓取web_urls和current_message_urls。每爬取10次清空所有数据。
+
+发短信模块默认每10分钟扫描一次current_message_urls，不为空才会发短信。发送成功后会把current_message_urls合并到outdated_message_urls中，并清空current_message_urls。
+
 
 不支持Python3.
 
