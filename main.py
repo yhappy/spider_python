@@ -83,15 +83,15 @@ class Crawler:
             title = url.string
             if filter(lambda x: x in title, WEB_FILETER_KEYS):
                 self.rs.sadd('web_urls', url)
-            if filter(lambda x: x in title, MESSAGE_FILETER_KEYS):
-                self.rs.sadd('message_urls', url)
+            if filter(lambda x: x in title, MESSAGE_FILETER_KEYS) and not self.rs.sismember('outdated_message_urls', url):
+                self.rs.sadd('current_message_urls', url)
 
     def _flush_redis_if_needed(self):
         if int(self.rs.get('times')) >= REDIS_FLUSH_FREQUENCE:
             self.rs.flushall()
 
     def _get_message_urls_from_redis(self):
-        ret = self.rs.smembers('message_urls')
+        ret = self.rs.smembers('current_message_urls')
         urls = "" 
         for herf in ret:
             urls += herf + "<br>"
@@ -104,6 +104,10 @@ class Crawler:
             urls += "<tr><td>" + herf + "</td></tr>"
         return urls
     
+    def _refresh_message_urls_in_redis(self):
+        rs.sunionstore('outdated_message_urls', 'current_message_urls', 'outdated_message_urls')
+        rs.delete('current_message_urls')
+
     def generate_page(self):
         return '''
                 <html>
@@ -155,6 +159,7 @@ class Crawler:
             stp.login(SEND_MAIL_USER, SEND_MAIL_PASSWORD)
             stp.sendmail(send_mail_address, to_adress, msg.as_string())
             print "send message sucessfully..."
+            self._refresh_message_urls_in_redis()
         except Exception, e:
             print "fail to send message: "+ str(e)
         finally:
