@@ -5,7 +5,7 @@ spider_python
 
 爬虫默认每隔1小时抓取1次，每抓取10次清空所有数据。
 
-新增移动手机短信通知功能，需要在conf.py里配置139手机号，发件箱账号和密码。
+新增手机短信通知功能，需要在conf.py里配置139手机号，发件箱账号和密码。
 
 Unix/Windows下均需要先在本机安装[redis](http://redis.io)服务程序，然后在Unix下运行redis-server，在Windows下启动redis-server.exe。
 
