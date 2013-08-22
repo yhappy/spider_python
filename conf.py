@@ -33,7 +33,7 @@ CRAWLER_FREQUENCE_HOURS = 1
 MESSAGE_FREQUENCE_MINUTES = 10
 
 # Web页面筛选的关键词
-WEB_FILETER_KEYS = (u'校招', u'应届', u'毕业生',)
+WEB_FILETER_KEYS = (u'校招', u'应届', u'毕业生')
 
 # 短信通知筛选的关键词
 MESSAGE_FILETER_KEYS = (u'Google', u'网易游戏', u'阿里')
