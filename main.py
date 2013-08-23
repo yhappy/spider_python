@@ -81,10 +81,19 @@ class Crawler:
     def _put_urls_into_redis(self, urls):
         for url in urls:
             title = url.string
-            if filter(lambda x: x in title, WEB_FILETER_KEYS):
+            if filter(lambda x: x in title, WEB_FILETER_PRI_KEYS):
                 self.rs.sadd('web_urls', url)
-            if filter(lambda x: x in title, MESSAGE_FILETER_KEYS) and not self.rs.sismember('outdated_message_urls', url):
-                self.rs.sadd('current_message_urls', url)
+            else:
+                if filter(lambda x: x in title, WEB_FILETER_KEYS) and not filter(lambda x: x in title,WEB_FILETER_EXCLUDE_KEYS):
+                    self.rs.sadd('web_urls', url)
+
+            if filter(lambda x: x in title, MESSAGE_FILETER_PRI_KEYS):
+                if not self.rs.sismember('outdated_message_urls', url):
+                    self.rs.sadd('current_message_urls', url)
+            else:
+                if filter(lambda x: x in title, MESSAGE_FILETER_KEYS) and not filter(lambda x: x in title,MESSAGE_FILETER_EXCLUDE_KEYS)
+                    if not self.rs.sismember('outdated_message_urls', url):
+                        self.rs.sadd('current_message_urls', url)
 
     def _delete_web_urls_if_needed(self):
         if int(self.rs.get('times')) >= REDIS_FLUSH_FREQUENCE:

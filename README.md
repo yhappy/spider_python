@@ -3,11 +3,33 @@ spider_python
 
 抓取北邮人论坛和水木社区校招信息的爬虫程序。
 
-新增手机短信通知功能，需要在conf.py里配置139手机号，发件箱账号和密码。
+新增手机短信通知功能，需要在conf.py里配置139手机号，发件箱账号和密码。(短信通知功能也可作为邮件通知功能)
 
 爬取模块默认每1小时运行1次，同时抓取web_urls和current_message_urls。每爬取10次清空所有数据。
 
 发短信模块默认每10分钟扫描一次current_message_urls，不为空才会发短信。发送成功后会把current_message_urls合并到outdated_message_urls中，并清空current_message_urls。
+
+
+在conf.py里根据自己的兴趣定制筛选的关键词,抓取你想要的信息,
+WEB_FILTER_*_KEYS是针对Web页面抓取的关键词
+MESSAGE_FILETER_*_KEYS是针对短信及邮件通知的关键词
+
+# 包含WEB_FILETER_PRI_KEYS的链接一定会被抓取
+WEB_FILETER_PRI_KEYS = (u'校招', u'应届', u'毕业生')
+# 包含WEB_FILETER_KEYS且不包含WEB_FILETER_EXCLUDE_KEYS的链接会被抓取
+WEB_FILETER_KEYS = (u'百度', u'阿里', u'腾讯',u'网易')
+WEB_FILETER_EXCLUDE_KEYS = (u'社招')
+
+Example:
+
+"[社招/校招] 阿里巴巴招聘实习生" # True,信息包含WEB_FILETER_PRI_KEYS 
+"[社招] 阿里巴巴招聘实习生" # False,信息虽包含WEB_FILETER_KEYS但也包含WEB_FILETER_EXCLUDE_KEYS 
+"阿里巴巴招聘实习生" # True,信息虽包含WEB_FILETER_KEYS且不包含WEB_FILETER_EXCLUDE_KEYS 
+
+MESSAGE_FILETER_PRI_KEYS
+MESSAGE_FILETER_KEYS 
+MESSAGE_FILETER_EXCLUDE_KEYS
+也是同样的道理
 
 
 不支持Python3.
