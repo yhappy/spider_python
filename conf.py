@@ -33,10 +33,18 @@ CRAWLER_FREQUENCE_HOURS = 1
 MESSAGE_FREQUENCE_MINUTES = 10
 
 # Web页面筛选的关键词
-WEB_FILETER_KEYS = (u'校招', u'应届', u'毕业生')
+# 包含PRI_KEYS的链接一定会被抓取
+WEB_FILETER_PRI_KEYS = (u'校招', u'应届', u'毕业生')
+# 包含KEYS且不包含EXCLUDE_KEYS的链接会被抓取
+WEB_FILETER_KEYS = (u'百度', u'阿里', u'腾讯',u'网易')
+WEB_FILETER_EXCLUDE_KEYS = (u'社招')
 
 # 短信通知筛选的关键词
+# 包含PRI_KEYS的链接一定会被抓取
+MESSAGE_FILETER_PRI_KEYS= ()
+# 包含KEYS且不包含EXCLUDE_KEYS的链接会会被抓取
 MESSAGE_FILETER_KEYS = (u'Google', u'网易游戏', u'阿里')
+MESSAGE_FILETER_EXCLUDE_KEYS = (u'社招')
 
 # 发件箱的域名
 SEND_MAIL_POSTFIX = "163.com"
