@@ -81,19 +81,27 @@ class Crawler:
     def _put_urls_into_redis(self, urls):
         for url in urls:
             title = url.string
-            if filter(lambda x: x in title, WEB_FILETER_PRI_KEYS):
-                self.rs.sadd('web_urls', url)
-            else:
-                if filter(lambda x: x in title, WEB_FILETER_KEYS) and not filter(lambda x: x in title,WEB_FILETER_EXCLUDE_KEYS):
-                    self.rs.sadd('web_urls', url)
+            add_to_web = add_to_msg = False
 
+            if filter(lambda x: x in title, WEB_FILETER_KEYS):
+                add_to_web = True
+            if filter(lambda x: x in title, WEB_FILETER_EXCLUDE_KEYS):
+                add_to_web = False
+            if filter(lambda x: x in title, WEB_FILETER_PRI_KEYS):
+                add_to_web = True
+            if  add_to_web:
+                self.rs.sadd('web_urls', url)
+
+            if self.rs.sismember('outdated_message_urls', url):
+                return
+            if filter(lambda x: x in title, MESSAGE_FILETER_KEYS):
+                add_to_msg = True
+            if filter(lambda x: x in title, MESSAGE_FILETER_EXCLUDE_KEYS):
+                add_to_msg = False
             if filter(lambda x: x in title, MESSAGE_FILETER_PRI_KEYS):
-                if not self.rs.sismember('outdated_message_urls', url):
-                    self.rs.sadd('current_message_urls', url)
-            else:
-                if filter(lambda x: x in title, MESSAGE_FILETER_KEYS) and not filter(lambda x: x in title,MESSAGE_FILETER_EXCLUDE_KEYS)
-                    if not self.rs.sismember('outdated_message_urls', url):
-                        self.rs.sadd('current_message_urls', url)
+                add_to_msg = True
+            if  add_to_msg:
+                self.rs.sadd('current_message_urls', url)
 
     def _delete_web_urls_if_needed(self):
         if int(self.rs.get('times')) >= REDIS_FLUSH_FREQUENCE:
