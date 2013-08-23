@@ -35,8 +35,8 @@ class HttpHandler(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/html")
         self.end_headers()
         self.wfile.write(page)
-        return 
-    
+        return
+
 
 class Crawler:
 
@@ -93,21 +93,21 @@ class Crawler:
 
     def _get_message_urls_from_redis(self):
         ret = self.rs.smembers('current_message_urls')
-        urls = "" 
+        urls = ""
         for herf in ret:
             urls += herf + "<br>"
         return len(ret), urls
 
     def _get_web_urls_from_redis(self):
         ret = self.rs.smembers('web_urls')
-        urls = "" 
+        urls = ""
         for herf in ret:
             urls += "<tr><td>" + herf + "</td></tr>"
         return urls
-    
+
     def _refresh_message_urls_in_redis(self):
-        rs.sunionstore('outdated_message_urls', 'current_message_urls', 'outdated_message_urls')
-        rs.delete('current_message_urls')
+        self.rs.sunionstore('outdated_message_urls', 'current_message_urls', 'outdated_message_urls')
+        self.rs.delete('current_message_urls')
 
     def generate_page(self):
         return '''
@@ -140,12 +140,12 @@ class Crawler:
                     </body>
                     </html>
                 ''' % self._get_web_urls_from_redis()
-    
+
     def send_massage(self):
         msg_num, content = self._get_message_urls_from_redis()
         if msg_num <= 0 :
             print "none messages to send..."
-            return 
+            return
         sub = "抓取到%d条高优先级校招信息" % msg_num
         send_mail_address = SEND_MAIL_USER_NAME + "<" + SEND_MAIL_USER + "@" + SEND_MAIL_POSTFIX + ">"
         msg = MIMEText(content, 'html', 'utf-8')
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     sched.start()
     sched.add_interval_job(crawler.run, hours=CRAWLER_FREQUENCE_HOURS)
     sched.add_interval_job(crawler.send_massage, minutes=MESSAGE_FREQUENCE_MINUTES)
-    
+
 
     try:
         print "start server ..."
