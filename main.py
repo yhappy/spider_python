@@ -93,9 +93,9 @@ class Crawler:
     
 
     def _put_message_url_into_redis(self, url):
-        title = url.string
         if self.rs.sismember('outdated_message_urls', url):
             return
+        title = url.string
         if Crawler.str_contains_any_tuple_elements(title, MESSAGE_FILETER_PRI_KEYS) or \
             Crawler.str_contains_any_tuple_elements(title, MESSAGE_FILETER_KEYS) and \
             not Crawler.str_contains_any_tuple_elements(title, MESSAGE_FILETER_EXCLUDE_KEYS):
