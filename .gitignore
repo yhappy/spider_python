@@ -34,3 +34,6 @@ nosetests.xml
 .project
 .pydevproject
 logging.txt
+
+# my conf
+conf.py
