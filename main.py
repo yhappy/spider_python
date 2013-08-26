@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
+
 '''
 #=============================================================================
 #     FileName: main.py
@@ -17,6 +19,7 @@ from BeautifulSoup import BeautifulSoup
 from apscheduler.scheduler import Scheduler
 from email.mime.text import MIMEText
 from conf import *
+from optparse import OptionParser
 
 import smtplib
 import sys
@@ -59,6 +62,14 @@ class Crawler:
                                         "X-Requested-With" : "XMLHttpRequest",
                                     },
                                     'href' : "^/nForum/article/Career_Campus/\d+$",
+                                },
+                                {
+									'host' : 'http://bbs.byr.cn',
+									'url'  : 'http://bbs.byr.cn/#!board/Job',
+                                    'headers' : {
+                                        "X-Requested-With" : "XMLHttpRequest",
+                                    },
+                                    'href' : "^/article/Job/\d+$",
                                 },
                         )
 
@@ -162,7 +173,7 @@ class Crawler:
                     </html>
                 ''' % self._get_web_urls_from_redis()
 
-    def send_massage(self):
+    def send_massage(self, *args, **kwargs):
         msg_num, content = self._get_message_urls_from_redis()
         if msg_num <= 0 :
             print "none messages to send..."
@@ -174,12 +185,21 @@ class Crawler:
         msg["Accept-Charset"]="ISO-8859-1, utf-8"
         msg['Subject'] = sub
         msg['From'] = send_mail_address
-        msg['to'] = to_adress = "139SMSserver<" + RECEIVE_MAIL_USER + "@" + RECEIVE_MAIL_POSTFIX + ">"
         try:
             stp = smtplib.SMTP()
             stp.connect(SEND_MAIL_HOST)
+			# NOTE(xiyoulaoyuanjia): it get error do not have
+			# it smtplib.SMTPException: SMTP AUTH extension not supported by server
+            stp.starttls()
             stp.login(SEND_MAIL_USER, SEND_MAIL_PASSWORD)
-            stp.sendmail(send_mail_address, to_adress, msg.as_string())
+			# FIX(xiyoulaoyuanjia): here if sms get error. do not
+			# send email notification
+            if kwargs['sms']:
+                msg['to'] = to_adress = "139SMSserver<" + RECEIVE_MAIL_USER_139 + "@" + RECEIVE_MAIL_POSTFIX_139 + ">"
+                stp.sendmail(send_mail_address, to_adress, msg.as_string())
+            if kwargs['email']:
+                msg['to'] = to_adress = RECEIVE_MAIL_USER + "@" + RECEIVE_MAIL_POSTFIX
+                stp.sendmail(send_mail_address, to_adress, msg.as_string())
             print "send message sucessfully..."
             self._refresh_message_urls_in_redis()
         except Exception, e:
@@ -199,13 +219,19 @@ class Crawler:
 
 if __name__ == '__main__':
 
+    parser = OptionParser(description='a crawer which get jobs info.')
+    parser.add_option('-s', '--sms', dest='sms', action='store_true',
+			            help='send sms mode')
+    parser.add_option('-e', '--email', dest='email', action='store_true',
+			            help='send email mode')
+    (options, args) = parser.parse_args(args=sys.argv[1:])
     crawler = Crawler()
     crawler.run()
 
     sched = Scheduler()
     sched.start()
     sched.add_interval_job(crawler.run, hours=CRAWLER_FREQUENCE_HOURS)
-    sched.add_interval_job(crawler.send_massage, minutes=MESSAGE_FREQUENCE_MINUTES)
+    sched.add_interval_job(crawler.send_massage, minutes=MESSAGE_FREQUENCE_MINUTES, kwargs=options.__dict__)
 
 
     try:
