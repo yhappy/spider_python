@@ -43,6 +43,18 @@ spider_python
 
     "阿里巴巴招聘实习生" # True,信息虽包含WEB_FILETER_KEYS且不包含WEB_FILETER_EXCLUDE_KEYS 
 
+###爬取目标的设置
+本程序默认爬取北邮和水木两个BBS板块的信息，如果你还想爬取其他目标的信息，要在main.py中self.http_querys元组内添加新网站设置信息的字典项。下面示例添加了爬取'天津大学就业指导中心的招聘信息板块'的设置：
+
+    {
+        'host' : 'http://job.tju.edu.cn/', #网站的域名，'host'+'href'应该能够合成为一个可访问的招聘信息的链接。
+        'url'  : 'http://job.tju.edu.cn/zhaopinxinxi.php', #设置你要爬取的页面，该页面包含了招聘信息的链接，通常为招聘板块的首页。
+        'headers' : {	                   #headers的设置保持不变
+            "X-Requested-With" : "XMLHttpRequest",
+               },
+        'href' : r"^zhaopinxinxi_detail.php\?id=\d+$", #设置匹配字符串，匹配'url'网页中<a>标签的href内容。设置本项时可以在'url'网页中找一条招聘信息的超链接<a>，将其中的href内容放入字符串，href尾部数字部分用'\d+'代替，如果链接中有'?'，需要改成'\?'进行转义。
+    },
+    
 ##安装与运行
 Unix/Windows下均需要先在本机安装[redis](http://redis.io)服务程序，然后在Unix下运行redis-server，在Windows下启动redis-server.exe。
 
