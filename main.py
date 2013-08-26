@@ -64,6 +64,7 @@ class Crawler:
 
     def _parse_html_to_urls(self, host, url, headers, href):
         r = requests.get(url, headers=headers)
+        r.encoding = 'GBK'
         frs_soup = BeautifulSoup(r.text)
         frs_attrs = {
             'href' : re.compile(href),
