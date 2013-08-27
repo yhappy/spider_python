@@ -198,8 +198,8 @@ class Crawler:
                 msg['to'] = to_adress = "139SMSserver<" + RECEIVE_MAIL_USER_139 + "@" + RECEIVE_MAIL_POSTFIX_139 + ">"
                 stp.sendmail(send_mail_address, to_adress, msg.as_string())
             if kwargs['email']:
-                msg['to'] = to_adress = RECEIVE_MAIL_USER + "@" + RECEIVE_MAIL_POSTFIX
-                stp.sendmail(send_mail_address, to_adress, msg.as_string())
+				msg['to'] = ";".join(RECEIVE_MAIL_LIST)
+				stp.sendmail(send_mail_address, RECEIVE_MAIL_LIST, msg.as_string())
             print "send message sucessfully..."
             self._refresh_message_urls_in_redis()
         except Exception, e:

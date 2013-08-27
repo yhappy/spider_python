@@ -67,11 +67,6 @@ RECEIVE_MAIL_USER_139 = "手机号"
 # 139收件箱的域名
 RECEIVE_MAIL_POSTFIX_139 = "139.com"
 
-
-# 邮箱收件箱的用户名
-RECEIVE_MAIL_USER = "用户名"
-
-# 邮箱收件箱的域名
-RECEIVE_MAIL_POSTFIX = "gmail.com"
-
+# 收件箱
+RECEIVE_MAIL_LIST = ["xiyoulaoyuanjia@gmail.com","test@qq.com",]
 
