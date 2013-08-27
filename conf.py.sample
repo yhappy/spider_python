@@ -62,9 +62,16 @@ SEND_MAIL_PASSWORD = "密码"
 SEND_MAIL_USER_NAME = "昵称"
 
 # 139收件箱的用户名，即手机号
-RECEIVE_MAIL_USER = "手机号"
+RECEIVE_MAIL_USER_139 = "手机号"
 
 # 139收件箱的域名
-RECEIVE_MAIL_POSTFIX = "139.com"
+RECEIVE_MAIL_POSTFIX_139 = "139.com"
+
+
+# 邮箱收件箱的用户名
+RECEIVE_MAIL_USER = "用户名"
+
+# 邮箱收件箱的域名
+RECEIVE_MAIL_POSTFIX = "gmail.com"
 
 

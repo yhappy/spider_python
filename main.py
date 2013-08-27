@@ -65,7 +65,7 @@ class Crawler:
                                 },
                                 {
 									'host' : 'http://bbs.byr.cn',
-									'url'  : 'http://bbs.byr.cn/#!board/Job',
+									'url'  : 'http://bbs.byr.cn/board/Job',
                                     'headers' : {
                                         "X-Requested-With" : "XMLHttpRequest",
                                     },
