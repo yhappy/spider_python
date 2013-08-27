@@ -33,7 +33,7 @@ spider_python
     
     WEB_FILETER_PRI_KEYS = (u'校招', u'应届', u'毕业生')
     WEB_FILETER_KEYS = (u'百度', u'阿里', u'腾讯',u'网易')
-    WEB_FILETER_EXCLUDE_KEYS = (u'社招')
+    WEB_FILETER_EXCLUDE_KEYS = (u'社招',)
 
 测试结果如下:
     
@@ -79,7 +79,7 @@ Unix/Windows下均需要先在本机安装[redis](http://redis.io)服务程序�
     pip install redis
     pip install requests
     
-然后直接运行main.py程序，访问<http://127.0.0.1:8888>
+然后直接运行main.py程序，访问<http://127.0.0.1:8888> -e 与 -s 参数分别开启 邮件与短信通知功能,具体可以python main.py help 查看
     
 ##WEB页面效果
 
