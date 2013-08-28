@@ -45,37 +45,7 @@ class Crawler:
 
     def __init__(self):
         self.rs = redis.Redis(host=REDIS_IP, port=REDIS_PORT)
-        self.http_querys = (
-                                {
-                                    'host' : 'http://bbs.byr.cn',
-                                    'url'  : 'http://bbs.byr.cn/board/JobInfo',
-                                    'headers' : {
-                                        "X-Requested-With" : "XMLHttpRequest",
-                                    },
-                                    'href' : "^/article/JobInfo/\d+$",
-                                    'source' : u'北邮人-招聘信息',
-                                },
-
-                                {
-                                    'host' : 'http://www.newsmth.net',
-                                    'url'  : 'http://www.newsmth.net/nForum/board/Career_Campus',
-                                    'headers' : {
-                                        "X-Requested-With" : "XMLHttpRequest",
-                                    },
-                                    'href' : "^/nForum/article/Career_Campus/\d+$",
-                                    'source' : u'水木-校园招聘',
-                                },
-
-                                {
-                                    'host' : 'http://bbs.byr.cn',
-                                    'url'  : 'http://bbs.byr.cn/board/Job',
-                                    'headers' : {
-                                        "X-Requested-With" : "XMLHttpRequest",
-                                    },
-                                    'href' : "^/article/Job/\d+$",
-                                    'source' : u'北邮人-毕业生找工作',
-                                },
-                        )
+        self.http_querys = HTTP_QUERYS
 
     def _parse_html_to_urls(self, **http_query):
         host = http_query['host']
@@ -97,7 +67,7 @@ class Crawler:
         for res in frs_res:
             if res.parent.parent.get('class') != 'top':
                 res['href'] = host + res['href']
-                res.string += " --" + source
+                res.string += u" 来源:" + source
                 urls.append(res)
         return urls
     

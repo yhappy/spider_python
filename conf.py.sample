@@ -70,3 +70,35 @@ RECEIVE_MAIL_POSTFIX_139 = "139.com"
 # 收件箱
 RECEIVE_MAIL_LIST = ["xiyoulaoyuanjia@gmail.com","test@qq.com",]
 
+# 爬取的目标网站
+HTTP_QUERYS = (
+                {
+                    'host' : 'http://bbs.byr.cn',
+                    'url'  : 'http://bbs.byr.cn/board/JobInfo',
+                    'headers' : {
+                        "X-Requested-With" : "XMLHttpRequest",
+                    },
+                    'href' : "^/article/JobInfo/\d+$",
+                    'source' : u'北邮人论坛-招聘信息',
+                },
+
+                {
+                    'host' : 'http://www.newsmth.net',
+                    'url'  : 'http://www.newsmth.net/nForum/board/Career_Campus',
+                    'headers' : {
+                        "X-Requested-With" : "XMLHttpRequest",
+                    },
+                    'href' : "^/nForum/article/Career_Campus/\d+$",
+                    'source' : u'水木社区-校园招聘信息',
+                },
+
+                {
+                    'host' : 'http://bbs.byr.cn',
+                    'url'  : 'http://bbs.byr.cn/board/Job',
+                    'headers' : {
+                        "X-Requested-With" : "XMLHttpRequest",
+                    },
+                    'href' : "^/article/Job/\d+$",
+                    'source' : u'北邮人论坛-毕业生找工作',
+                },
+            )
