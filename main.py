@@ -243,7 +243,6 @@ if __name__ == '__main__':
     sched.add_interval_job(crawler.run, hours=CRAWLER_FREQUENCE_HOURS)
     sched.add_interval_job(crawler.send_massage, minutes=MESSAGE_FREQUENCE_MINUTES, kwargs=options.__dict__)
 
-
     try:
         print "start server ..."
         server = HTTPServer((HOST_NAME, PORT_NUMBER), HttpHandler)
