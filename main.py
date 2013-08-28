@@ -53,6 +53,7 @@ class Crawler:
                                         "X-Requested-With" : "XMLHttpRequest",
                                     },
                                     'href' : "^/article/JobInfo/\d+$",
+                                    'source' : u'北邮人-招聘信息',
                                 },
 
                                 {
@@ -62,6 +63,7 @@ class Crawler:
                                         "X-Requested-With" : "XMLHttpRequest",
                                     },
                                     'href' : "^/nForum/article/Career_Campus/\d+$",
+                                    'source' : u'水木-校园招聘',
                                 },
                                 {
 									'host' : 'http://bbs.byr.cn',
@@ -70,10 +72,17 @@ class Crawler:
                                         "X-Requested-With" : "XMLHttpRequest",
                                     },
                                     'href' : "^/article/Job/\d+$",
+                                    'source' : u'北邮人-毕业生找工作',
                                 },
                         )
 
-    def _parse_html_to_urls(self, host, url, headers, href):
+    def _parse_html_to_urls(self, **http_query):
+        host = http_query['host']
+        url = http_query['url']
+        headers = http_query['headers']
+        href = http_query['href']
+        source = http_query['source']
+
         r = requests.get(url, headers=headers)
         r.encoding = 'GBK'
         frs_soup = BeautifulSoup(r.text)
@@ -87,6 +96,7 @@ class Crawler:
         for res in frs_res:
             if res.parent.parent.get('class') != 'top':
                 res['href'] = host + res['href']
+                res.string += " --" + source
                 urls.append(res)
         return urls
     
@@ -212,7 +222,7 @@ class Crawler:
         self.rs.incr('times')
         self._delete_web_urls_if_needed()
         for http_query in self.http_querys :
-            urls = self._parse_html_to_urls(http_query['host'], http_query['url'], http_query['headers'], http_query['href'])
+            urls = self._parse_html_to_urls(**http_query)
             self._put_urls_into_redis(urls)
         print "finish crawler ..."
 
