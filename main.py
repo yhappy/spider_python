@@ -65,9 +65,10 @@ class Crawler:
                                     'href' : "^/nForum/article/Career_Campus/\d+$",
                                     'source' : u'水木-校园招聘',
                                 },
+
                                 {
-									'host' : 'http://bbs.byr.cn',
-									'url'  : 'http://bbs.byr.cn/board/Job',
+                                    'host' : 'http://bbs.byr.cn',
+                                    'url'  : 'http://bbs.byr.cn/board/Job',
                                     'headers' : {
                                         "X-Requested-With" : "XMLHttpRequest",
                                     },
