@@ -79,9 +79,10 @@ class Crawler:
 
     def _put_web_url_into_redis(self, url):
         title = url.string
-        if Crawler.str_contains_any_tuple_elements(title, WEB_FILETER_PRI_KEYS) or \
-            Crawler.str_contains_any_tuple_elements(title, WEB_FILETER_KEYS) and \
-            not Crawler.str_contains_any_tuple_elements(title, WEB_FILETER_EXCLUDE_KEYS):
+        title_remove_source = title.rsplit(u'来源')[0] 
+        if Crawler.str_contains_any_tuple_elements(title_remove_source, WEB_FILETER_PRI_KEYS) or \
+            Crawler.str_contains_any_tuple_elements(title_remove_source, WEB_FILETER_KEYS) and \
+            not Crawler.str_contains_any_tuple_elements(title_remove_source, WEB_FILETER_EXCLUDE_KEYS):
                 self.rs.sadd('web_urls', url)
     
 
@@ -89,9 +90,12 @@ class Crawler:
         if self.rs.sismember('outdated_message_urls', url):
             return
         title = url.string
-        if Crawler.str_contains_any_tuple_elements(title, MESSAGE_FILETER_PRI_KEYS) or \
-            Crawler.str_contains_any_tuple_elements(title, MESSAGE_FILETER_KEYS) and \
-            not Crawler.str_contains_any_tuple_elements(title, MESSAGE_FILETER_EXCLUDE_KEYS):
+        # NOTE(Xiyoulaoyuanjia): must delete u'来源' before
+        # check.
+        title_remove_source = title.rsplit(u'来源')[0] 
+        if Crawler.str_contains_any_tuple_elements(title_remove_source, MESSAGE_FILETER_PRI_KEYS) or \
+            Crawler.str_contains_any_tuple_elements(title_remove_source, MESSAGE_FILETER_KEYS) and \
+            not Crawler.str_contains_any_tuple_elements(title_remove_source, MESSAGE_FILETER_EXCLUDE_KEYS):
                 self.rs.sadd('current_message_urls', url)
 
     def _put_urls_into_redis(self, urls):
@@ -169,11 +173,11 @@ class Crawler:
         try:
             stp = smtplib.SMTP()
             stp.connect(SEND_MAIL_HOST)
-			# NOTE(xiyoulaoyuanjia): it get error do not have
+			# NOTE(Xiyoulaoyuanjia): it get error do not have
 			# it smtplib.SMTPException: SMTP AUTH extension not supported by server
             stp.starttls()
             stp.login(SEND_MAIL_USER, SEND_MAIL_PASSWORD)
-			# FIX(xiyoulaoyuanjia): here if sms get error. do not
+			# FIX(Xiyoulaoyuanjia): here if sms get error. do not
 			# send email notification
             if kwargs['sms']:
                 msg['to'] = to_adress = "139SMSserver<" + RECEIVE_MAIL_USER_139 + "@" + RECEIVE_MAIL_POSTFIX_139 + ">"
