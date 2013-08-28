@@ -89,7 +89,7 @@ HTTP_QUERYS = (
                         "X-Requested-With" : "XMLHttpRequest",
                     },
                     'href' : "^/nForum/article/Career_Campus/\d+$",
-                    'source' : u'水木社区-校园招聘信息',
+                    'source' : u'水木社区',
                 },
 
                 {
@@ -99,6 +99,6 @@ HTTP_QUERYS = (
                         "X-Requested-With" : "XMLHttpRequest",
                     },
                     'href' : "^/article/Job/\d+$",
-                    'source' : u'北邮人论坛-毕业生找工作',
+                    'source' : u'北邮人论坛-找工作',
                 },
             )
