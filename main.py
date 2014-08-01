@@ -16,7 +16,8 @@
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from BeautifulSoup import BeautifulSoup
-from apscheduler.scheduler import Scheduler
+#apscheduler3.3.0版本
+from apscheduler.schedulers.background import BackgroundScheduler
 from email.mime.text import MIMEText
 from conf import *
 from optparse import OptionParser
@@ -213,11 +214,11 @@ if __name__ == '__main__':
     crawler = Crawler()
     crawler.run()
 
-    sched = Scheduler()
+    sched = BackgroundScheduler()
     sched.start()
-    sched.add_interval_job(crawler.run, hours=CRAWLER_FREQUENCE_HOURS)
-    sched.add_interval_job(crawler.send_massage, minutes=MESSAGE_FREQUENCE_MINUTES, kwargs=options.__dict__)
-
+    sched.add_job(crawler.run, 'interval',hours=CRAWLER_FREQUENCE_HOURS)
+    sched.add_job(crawler.send_massage, 'interval',minutes=MESSAGE_FREQUENCE_MINUTES, kwargs=options.__dict__)
+    
     try:
         print "start server ..."
         server = HTTPServer((HOST_NAME, PORT_NUMBER), HttpHandler)
